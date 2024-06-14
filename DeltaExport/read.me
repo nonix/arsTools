@@ -1,0 +1,61 @@
+ED22 migration process
+======================
+
+Note: This is the second edition of the process with now supported delat migration(s)
+
+Clone preparation:
+------------------
+01. identify the date of the last cut-off in EntarchC
+    assuming there were NO loads into EntarchC, then: select max(last_load_dt) from arsag; should provide
+02. From Production 
+  a. get list of all open segments 
+  b. list of segments where closed_date >= cut-off date excl. System%
+03. Format new "Report" by copying the previous in the XLS
+04. The list of Segments is the base for the delta migration using Unix
+05. to the resp. list of segments at the end append the list of all ars% tables; 
+    select name from sysibm.systables where creator=user and name like 'ARS%';
+06. make sure the EntarchC CMOD is down; arssockd -I ENTARCHC -T
+07. used copyDB.sh script to copy take snapshot of the Prod to EntarchC
+08. update ars tables in EntarchC:
+  a. switch off all logging: update arsag set log=0 where name not like 'System%';
+  b. switch off tracking query/retrieval: 
+     update arsag set type=type-134217728 where name not like 'System%' and bitand(type,134217728)>0;
+     update arsag set type=type-268435456 where name not like 'System%' and bitand(type,268435456)>0;
+  c. shwitch on use & search cache:
+     update arsag set type=type-512 where name not like 'System%' and bitand(type,512)>0;
+     update arsag set type=type-1024 where name not like 'System%' and bitand(type,1024)>0;
+  d. reset System log:
+     update arsag set sid=1,seg_id=0 where agid=12672;
+  e. delete all System% segments from arsseg
+     select 'drop table '||table_name||';' from arsseg where agid in (select agid from arsag where name like 'System%');
+     select 'drop tablespace odadm_'||table_name||';' from arsseg where agid in (select agid from arsag where name like 'System%');
+     delete arsseg where agid in (select agid from arsag where name like 'System%');
+09. Delete all PARS/*
+10. Delete all cache: CACHE/*
+  a. The ./retr dir must be created in advance
+11. Preseve EXPORT on REMOTE aka move it ...
+  a. Some scripts expect path DATA/REMOTE/EXPORT
+12. Delete all local DATA/EXPORT/*
+13. make sure all records in MIG_xxx tables have status=2, update otherwise
+14. Bootup CMOD EntarchC
+
+Export process:
+---------------
+01. Navigate to ~odadm/NN/ED22/DELTA4
+  a. activate my profile:                           . ~/NN/profile
+02. Initialize MIG table:                            nohup ./10_MIGinit.pl my_agid_name & (i.e.: DXA)
+03. Copy S3 to Cache:                                nohup ./20_s32cache.sh my_agid_name &
+04. Re-link cache dirs:                              nohup ./30_relink.pl my_agid_name &
+05. Update MIG_xxx.status:                           nohup ./40_status_update.pl my_agid_name &
+06. Export data:                                     nohup ./50_export.sh my_agid_name &
+07. Make manifest:                                   nohup ./60_mkmanifest.pl my_agid_name &
+08. Clean-up cache (optional, based on CACHE usage): nohup ./70_cleanup.pl my_agid_name &
+09. Update the XLS column: STATE with respective state 0-6 and AGID_NAME with color Yellow in processing, Green all done OK, Red failed / investigation update Notes as see fit
+
+Hints and snipets:
+------------------
+# Initialize all from the list
+for agid_name in $(cat delta3.lst |grep -v \#); do
+  echo $agid_name
+  nohup ./10_MIGinit.pl $agid_name
+done
