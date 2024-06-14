@@ -1,0 +1,94 @@
+TSM to S3 Migration steps
+==========================
+# Execute only once for the migration
+mkdir /ars/XXX/data/S3
+ln -s /ars/XXX/data/S3 /ars/odadm/NN/S3/MIG/DATA
+cd /ars/odadm/NN/S3/MIG
+mkdir -p DATA/DOC DATA/LOG DATA/SQL DATA/S3
+
+# Login to AGKB - Prod (sb000137)
+cd /ars/odadm/NN/S3/MIG
+
+# To generate (but not execute) the SQLs; -r => with truncate SC_ table
+./10_genSQL.pl -r
+
+# To execute registration the migration table(s); in a case of re-run remove the done.
+#   i.e.: ./14_db2exec.sh DATA/SQL/SC_CKA.sql
+# alternative Usage: ./14_db2exec.sh AGN
+./14_db2exec.sh DATA/SQL/SC_AGN.sql
+
+# Prepare scripts for extraction from TSM
+#   i.e.: ./20_split2filelist.pl CKA
+./20_split2filelist.pl AGN
+
+# Execute the extraction from TSM
+./22_execExport.sh AGN
+
+# Update status to "exported" in SC_AGN
+#   i.e.: ls -1 DATA/DOC/CKA/ | ./updateSC.pl CKA 1
+# now integrated in 22_execExport. ls -1 DATA/DOC/AGN/ | ./updateSC.pl AGN 1
+
+# Create S3 links
+#   i.e.: find DATA/DOC/CKA -type f |sort -t'/' -k4,4n|./25_link4s3.pl CKA
+find DATA/DOC/AGN -type f |sort -t'/' -k4,4n|./25_link4s3.pl AGN
+
+# Sync local S3 dirs to S3 storage
+#   i.e.: ./30_awssync.sh AGN|stop
+#   (Optional use the "stop" instead of AGN to stop the Importing to S3) 
+./30_awssync.sh AGN
+
+# Update status to "uploaded" in SC_AGN
+#   i.e.: aws s3 ls s3://p-ondemand/IBM/ONDEMAND/AGARCH/CKA/ --recursive | perl -F/ -lane 'print $F[-1]'|./updateSC.pl CKA 2
+aws s3 ls s3://p-ondemand/IBM/ONDEMAND/AGARCH/AGN/ --recursive | perl -F/ -lane 'print $F[-1]'|./updateSC.pl AGN 2
+
+# Check where missing
+./updateSC.pl AGN -l
+
+# Re-map nid to S3
+#   i.e.: Usage: ./40_remapnid.pl AGN
+./40_remapnid.pl AGN
+
+# Check where missing
+./updateSC.pl AGN -l
+
+# Clean-up storage
+./60_cleanup.sh AGN
+ 
+================== SQL snipets =====================
+
+# Create base tables SC_*AGN* dynamic SQL
+
+select distinct
+    'create table SC_'||AGN||' (name varchar(11) not null, type char(1) not null default ''D'', status integer not null default 0);'
+from arsag where name not like 'System%' or name = 'System Log' order by 1;
+
+# Load with data dynamic SQL
+
+select distinct 
+'merge into SC_'||ag.AGN||' sc using (select distinct resource as doc_name from '||seg.table_name||' where pri_nid between 1 and 10 and int(resource)>0) t on (sc.name = t.doc_name) when not matched then insert (type,name) values (''R'',t.doc_name);' 
+from arsag ag
+    inner join arsseg seg
+    on ag.agid=seg.agid
+where ag.name not like 'System%'
+;
+select distinct 
+'merge into SC_'||ag.AGN||' sc using (select distinct translate(doc_name,'''',''$'','''') as doc_name from '||seg.table_name||' where pri_nid between 1 and 10 union select distinct left(doc_name,locate(trim(translate(doc_name,'''',''0123456789'')),doc_name)-1)||left(trim(translate(doc_name,'''',''0123456789'')),3)||''1'' as doc_name from '||seg.table_name||' where pri_nid between 1 and 10) t on (sc.name = t.doc_name) when not matched then insert (name) values (t.doc_name);' 
+from arsag ag
+    inner join arsseg seg
+    on ag.agid=seg.agid
+where ag.name not like 'System%'
+;
+select distinct 
+'merge into SC_'||ag.AGN||' sc using (select distinct resource as doc_name from '||seg.table_name||' where pri_nid between 1 and 10 and int(resource)>0) t on (sc.name = t.doc_name) when not matched then insert (type,name) values (''R'',t.doc_name);' 
+from arsag ag
+    inner join arsseg seg
+    on ag.agid=seg.agid
+where ag.name not like 'System%'
+;
+select distinct 
+'merge into SC_SL sc using (select distinct doc_name from '||seg.table_name||' where appl_id=''T'' and pri_nid between 1 and 10 union select distinct left(doc_name,locate(trim(translate(doc_name,'''',''0123456789'')),doc_name)-1)||left(trim(translate(doc_name,'''',''0123456789'')),3)||''1'' as doc_name from '||seg.table_name||' where appl_id=''T'' and pri_nid between 1 and 10) t on (sc.name = t.doc_name) when not matched then insert (name) values (t.doc_name);' 
+from arsag ag
+    inner join arsseg seg
+    on ag.agid=seg.agid
+where ag.name = 'System Log'
+;
