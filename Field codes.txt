@@ -1,0 +1,733 @@
+ARSSEG.MASK -- bit mapped
+--------------------------
+	1 = table is on-line
+	2 = ?
+	4 = Not own Table space (i.e.: USERSPACE1)
+	8 = Migrated Out
+
+  128 = Automatic TS
+
+ARSAG.LOG -- bit mask
+--------------------
+Document:
+    Before qry = 1 
+    Retrieval = 2
+    Server printing = 4
+    Retrieval (bulk) = 8
+    Index Upd = 16
+    Index Add = 256
+    Index Del = 512
+    After qry = 8192
+
+Object:
+    Store = 32
+    Retrieve = 64
+
+Annotation:
+    Add = 1024
+    Del = 2048
+    Upd = 4096
+
+ARSAG.TYPE -- bit maks
+----------------------
+       16 = use tablespaces (SMS)
+       32 = use tablespaces (DMS)
+	   64 = Use Filegroups
+      512 = don't use cache
+     1024 = don't search cache
+     8192 = Don't Query using paramter markers (uncheck fld)
+    16384 = Use enhanced retention management
+    32768 = Implied hold (need Use ERM)
+    65536 = Automatic TS (reset 16)
+   131072 = General - Advanced - Interoperability with P8 - Use CFS-CMOD : Yes (bit set) - No (bit not set)
+   262144 = General - Advanced - Interoperability with P8 - Use CFS-CMOD - Federate Doc automatically : Yes (bit set) - No (bit not set)
+   524288 = Compress Table/Tablespace
+  1048576 = General - Advanced - Interoperability with P8 - Use CFS-CMOD - Enable Enterprise Record to declare record auto : Yes (bit set) - No (bit not set)
+  2097152 = Resource Data - Cache resource data for
+  4194304 = Storage Management - Cache Data - Resource Data - Restore Resources to Cache: No (bit set) - Yes (bit not set)
+  8388608 = Document data - no cache
+ 16777216 = Use Full Text Index
+ 33554432 = Full text index documents automaticaly (needs Use FTI)
+ 67108864 = Tracking Load
+134217728 = Tracking Query
+268435456 = Tracking Retrieval
+
+ARSAG.EXPIRE_TYPE
+--------------------
+53 = Segment
+4C = Load
+4D = Storage Manager (zOS)
+41 = Document	
+
+ARSAG.MGRT_CACHE_DATE
+---------------------------
+0 = When next arsmaint runs
+-1 = immediate with load
+	
+ARSAGPERMS.ANN_PERMS (Annotation permission bits):
+----------------------------
+1=View
+2=Add
+4=Delete
+8=Update
+16=N/A (Print)
+32=N/A (Fax)
+64=Copy
+
+ARSAGPERMS.DOC_PERMS (Document permission bits):
+----------------------------
+1=View
+2=Add
+4=Delete
+8=Update
+16=Print
+32=Fax
+64=Copy
+128=Hold
+256=CFS-OD
+
+ARSAPP.DOC_COMP_TYPE
+----------------------------
+46 = OD77 Lite
+44 = Disable
+4F = OD77 'O'
+4E = None
+4C = LZ12
+5A = LZ16
+
+ARSAPP.DOC_TYPE
+--------------------
+41 = AFP
+4C = line
+42 = BMP
+47 = GIF
+50 = PCX
+54 = TIFF
+52 = PDF
+4A = JFIF/JPEG
+51 = PNG
+4D = Metacode
+55 = User defined
+4E = None
+5A = XML
+--------- decode ----
+decode(doc_type,x'41','AFP',x'4C','line',x'42','BMP',x'47','GIF',x'50','PCX',x'54','TIFF',x'52','PDF',x'4A','JFIF/JPEG',x'51','PNG',x'4D','Metacode',x'55','User defined',x'4E','None',x'5A','XML','???') as File_type
+
+ARSAPP.IDX_TYPE
+--------------------
+4C = XML
+4E = None
+47 = Generic
+41 = ACIF
+
+ARSAPP.COMP_OBJ_SIZE
+----------------------
+mod(comp_obj_size,1024)!=0 = Large Object
+
+ARSFOL.ANN_SEARCH
+----------------------
+  1  = Note or ...
+  4  = Retrieve or ...
+  8  = Hit list 
+ 16 = Display document location
+ 64 = Always ON (annotaion?)
+128 = Display Hold flag
+
+ARSFOLFLD.TYPE
+----------------------------
+49 = Integer
+44 = Decimal
+42 = Big Int
+4E = Date
+53 = String
+
+ARSFOLFLD.MAP_TYPE
+----------------------------
+1 = Single
+3 = Or (Check arsag2fol field1 and field2)
+
+ARSFOLFLDUSR.OPS
+----------------------------
+1 = Equal
+2 = Not Equal
+4 = Less Then
+8 = Less Then Or Equal
+16 = Greater Then
+32 = Greater then Or Equal
+64 = In
+128 = Not In
+256 = Like
+512 = Not LIke
+1024 = Between
+2048 = Not Between
+
+ARSFOLPERMS.PERMS
+------------------
+1 = Access
+14 = Admin (needs access)
+32 = Allow Public Query (needs access and view q)
+64 = Allow Private Query (needs access and view q)
+128 = View Named Query (needs access)
+256 = Secondary Folder
+520 = Full Report Browse (needs access)
+1024 = Server Based Sorting (needs access)
+
+ARSFOLPERMS.HITS
+------------------
+-1 = Unlimited
+0 = No hits
+n = Number of hits
+
+ARSAGFLD.TYPE,QUAL 
+----------------------------
+49,42 = Integer
+44,42 = Decimal
+42,42 = Big Int
+4E,44 = Date	(20036)
+4E,54 = Time	(20052)
+49,43 = DateTime	(18755)
+49,5A = DateTime w/TZ	(18778)
+53,42 = String
+4E,42 = SmallInt
+61,44 = Date (New)	(24900)
+62,43 = DateTime (new)	(25155)
+62,5A = DateTime w/TZ (new)	(25178)
+
+ARSAGFLD.MASK
+----------------------------
+1 = Filter (or Index, if not set)
+2 = In Database field
+4 = Segment
+8 = AppID
+16 = Expire Date
+32 = Log
+64 = User exit
+4096 = Page count
+16384 = Extra field (added after AG creation)
+32768 = Is NOT updateable, if set
+65536 = lock down (HOLD field)
+8388608 = UUID
+
+ARSAGFLD.STRING_CASE
+--------------------
+4D = mixed case 'M'
+55 = upper case 'U'
+4C = lower case 'L'
+
+a SEG_table.a_lockDown
+----------------------------
+16384 = Implied hold
+
+ARSANN.Type (bit mask additive, exclusive in pairs)
+----------------------------
+1 = Server Copy NOK
+2 = Server Copy OK
+4 = Type Text
+8 = Type Graphical
+
+ARSNODE.STATUS (bit mask)
+----------------------------
+1 = ?
+2 = Primary / for Load
+4 = ?
+16 = Cache
+8192 = Secondary TSM (Option file in description "TSMCFG::tsmi2.opt")
+16384 = Hashed password (?)
+524288 = S3 (+TSM)
+262144 = HDFS
+2621440 = S3
+2097152 = TSM
+
+ARSSYS.SYS_MASK
+-----------------
+2 = PASSWORD Case Sensitive 
+4 = Use LDAP
+
+ARSNAMEQ.BUF (Opcodes)
+-----------------------
+1 = Equal
+2 = Not Equal
+4 = Less Than
+8 = Less Than or Equal
+16 = Greater Than
+32 = Greater Than or Equal
+64 = In
+128 = Not In
+256 = Like
+512 = Not Like
+1024 = Between
+2048 = Not Between
+
+ARSUSER.ADMIN 
+-----------------------
+4 = Administrator
+8 = User Administrator
+256 = Locked
+
+Bit map tree
+-------------
+1
+052 1     
+736 3631  
+368 4736 8421
+784 2157 3100 521
+473 1057 8994 2636 31
+105 7847 8478 4215 2684 21
+894 7842 6315 2105 7310 0052 1
+215 2631 0057 8473 6899 4215 2631
+426 8426 8426 8426 8426 8426 8426 8421
+
+Large Object topology
+---------------------
+A LO Object has doc_name with $ sign. i.e.: 6FAAZ$
+doc_name='6FAAZ$'
+doc_off=0, doc_len=41 <== Represents TOC
+comp_off=1059, comp_len=3641
+00000000  00 00 00 1a 00 00 04 b8  00 00 00 de 00 00 00 64  |...............d|
+00000010  00 9c 3a c8 00 00 0d 35  01 59 00 00 04 23 01 5a  |..:....5.Y...#.Z|
+00000020  00 00 00 00 00 ff ff ff  ff 0c 20 20 3c 41 75 64  |..........  <Aud|
+
+0000001a = 26	:Don't know, but seems like length of 1 TOC entry
+000004b8 = 1208	:??? could be version: 12.08
+000000de = 222	:Number of pages in this document
+00000064 = 100	:Number of pages per segment
+009c3ac8 = 10238664 :Comp_off
+00000d35 = 3381	: Comp_len
+01		 = 1	: String length
+59		 = 'Y'  : next doc_name; if this doc_name is 6FAAZ then look for 6FAAY
+00000423 = 1059	: Comp_len
+01		 = 1	: String length
+5a		 = 'Z'  : doc_name where the rest of the document is (6FAAZ)
+00000000 = 0
+00		 = 0
+ffffffff = -1 	: end of TOC
+
+
+
+ARSDOC Date conversion request
+-------------------------------
+ODDAT_agfieldNameDate between 'D1' and 'D2'
+ODDAT_agfieldNameDate = 'D1'
+
+CMOD macros
+-----------
+$ODUSERID	The user ID that is logged on to Content Manager OnDemand
+$ODALIAS	The user alias defined for the user ID that is logged on to Content Manager OnDemand
+$ODAGNAME	The application group name
+$ODAGID	    The application group internal identifier
+
+SQL snipets
+------------
+-- Function to convert HEX to INT
+CREATE OR REPLACE FUNCTION HEX2INT(str VARCHAR(8))
+RETURNS INTEGER
+SPECIFIC HEX2INT
+DETERMINISTIC NO EXTERNAL ACTION CONTAINS SQL
+BEGIN ATOMIC
+  DECLARE res INTEGER  DEFAULT 0;
+  DECLARE pos INTEGER DEFAULT 1;
+  DECLARE nibble CHAR(1);
+  WHILE pos <= LENGTH(str) DO
+    SET nibble = SUBSTR(str, pos, 1);
+    SET res = BITOR(CASE WHEN BITAND(res, 134217728) != 0
+                         THEN BITOR(16 * BITANDNOT(res, 134217728),
+                                    -2147483648)
+                         ELSE 16 * res END,
+                    CASE nibble
+                         WHEN '0' THEN 0
+                         WHEN '1' THEN 1
+                         WHEN '2' THEN 2
+                         WHEN '3' THEN 3
+                         WHEN '4' THEN 4
+                         WHEN '5' THEN 5
+                         WHEN '6' THEN 6
+                         WHEN '7' THEN 7
+                         WHEN '8' THEN 8
+                         WHEN '9' THEN 9
+                         WHEN 'A' THEN 10
+                         WHEN 'a' THEN 10
+                         WHEN 'B' THEN 11
+                         WHEN 'b' THEN 11
+                         WHEN 'C' THEN 12
+                         WHEN 'c' THEN 12
+                         WHEN 'D' THEN 13
+                         WHEN 'd' THEN 13
+                         WHEN 'E' THEN 14
+                         WHEN 'e' THEN 14
+                         WHEN 'F' THEN 15
+                         WHEN 'f' THEN 15
+                         ELSE RAISE_ERROR('78000', 'Not a hex string') 
+                         END),
+        pos = pos + 1;
+  END WHILE;
+  RETURN res;
+END;
+--#SET TERMINATOR ;
+
+General statistics
+------------------
+select distinct 
+ag.agid, ag.agid_name, a.alias as appid, a.name as appname, ag.name as agname, ag.description, 
+-- AG relevant
+(select count(*) from arsseg where agid=ag.agid) as seg_count,
+decode(mod(a.comp_obj_size,1024),0,'N','Y') as has_large_objects,
+decode(bitand(ag.type,16384),0,'N','Y') as is_ERM_RELEVANT,
+date(nvl(ag.last_load_dt,'1970-01-01')) as last_load_date,
+decode((select count(*) from arsseg where agid=ag.agid and closed_date=0),0,'Y','N') as is_cold,
+-- APP relevant
+'' as doc_count,'' as ann_count, '' as min_date, '' as max_date,
+decode(a.doc_type,x'41','AFP',x'4C','line',x'42','BMP',x'47','GIF',x'50','PCX',x'54','TIFF',x'52','PDF',x'4A','JFIF/JPEG',x'51','PNG',x'4D','Metacode',x'55',cast('User defined:'||substr(substr(a.fixed_view,instr(a.fixed_view,'EXTENSION=')+10),1,instr(substr(a.fixed_view,instr(a.fixed_view,'EXTENSION=')+10),chr(10))-1) as varchar),x'4E','None',x'5A','XML','???') as File_type
+from arsag ag
+    inner join arsapp a
+        on ag.agid = a.agid
+where ag.name not like 'System%'
+order by 1;
+
+--Dynamic SQL count by table by ag/app
+--------------------------------------
+select distinct 
+'select '||ag.agid||' as agid,'||decode(af_ap.name is null,true,'''''','t.'||af_ap.name)||
+' as appid,count(*) as rec_count, sum(cast(t.doc_len as bigint)+nvl((select cast(decomp_size as bigint) from arsres where agid='||ag.agid||
+' and rid=resource),0)) as data_size, sum(decode(ann.doc_name is null,true,0,1)) as ann_count, min('||af_dd.name||') as min_date, max('||af_dd.name||
+') as max_date from '||seg.table_name||' t left outer join arsann ann on ann.doc_name=t.doc_name and ann.doc_off=t.doc_off and ann.doc_len=t.doc_len and ann.comp_off=t.comp_off and ann.comp_len=t.comp_len and ann.agid='||ag.agid||decode(nvl(af_ap.name,'-'),'-','',' group by t.'||af_ap.name)||' union'
+from arsag ag
+    inner join arsseg seg
+        on ag.agid = seg.agid
+    inner join arsagfld af_dd
+        on ag.agid = af_dd.agid
+        and bitand(af_dd.mask,4)=4
+    left outer join arsagfld af_ap
+        on ag.agid = af_ap.agid
+        and bitand(af_ap.mask,8)=8
+where ag.name not like 'System%'
+order by 1;
+
+
+-- Make doc_name sortable
+CREATE or replace FUNCTION name0doc (doc_name varchar(11))
+ RETURNS varchar(11)
+ LANGUAGE SQL
+ CONTAINS SQL
+ NO EXTERNAL ACTION
+ DETERMINISTIC
+ RETURN (translate(doc_name,'','0123456789$','')||lpad(translate(doc_name,'','ABCDEFGHIJKLMNOPQRSTUVWXYZ$',''),7,'0'));
+
+-- Get the size of containers aka used storage
+select t.doc_name, t.comp_off+(select distinct comp_len from UBA1 where doc_name=t.doc_Name and comp_off=t.comp_off) as doc_size
+from (select doc_name,max(comp_off) as comp_off from UBA1 group by doc_name) t 
+order by 1;
+
+-- Select all folders w. fields , AppGrps w. fields
+select f.name as folname, ff.name as folfld,a.name as agname,af.name as agfld from arsag2fol a2f
+  inner join arsfol f
+    on a2f.fid = f.fid
+  inner join arsfolfld ff
+    on a2f.fid = ff.fid
+    and a2f.folder_field = ff.field
+  inner join arsag a
+    on a2f.agid = a.agid
+  inner join arsagfld af
+    on a2f.agid = af.agid
+    and a2f.appgrp_field1 = af.field
+order by 1,2,3,4;
+
+-- Select all folders for respective AG(s)
+select distinct f.name as folder,ag.name as agname from arsag ag
+  inner join arsag2fol a2f
+    on ag.agid=a2f.agid
+  inner join arsfol f
+    on a2f.fid=f.fid
+where ag.agid_name in ('KYA')
+order by 2,1;
+
+-- Get tables, fields, etc. by Folder Name
+------------------------------------------------
+select distinct seg.table_name,af.name,ag.name,ff.name,ag.agid,af.field
+from arsfol f
+    inner join arsfolfld ff
+        on f.fid = ff.fid
+        and lower(ff.name) in ('formular','ordner')
+    inner join arsag2fol a2f
+        on a2f.fid = ff.fid
+        and a2f.folder_field = ff.field
+    inner join arsagfld af
+        on a2f.agid=af.agid
+        and a2f.appgrp_field1 = af.field
+    inner join arsseg seg
+        on af.agid = seg.agid
+    inner join arsag ag
+        on seg.agid=ag.agid
+where f.name='AKB allg. Kundenansicht'
+order by 3,2;
+
+
+-- order ARSSEG by table_name numericaly:
+trim(translate(table_name,'','0123456789')),int(right(table_name,length(table_name)-length(trim(translate(table_name,'','0123456789')))))
+
+-- get LoadID from doc_name:
+int(left(doc_name,locate(trim(translate(doc_name,'','0123456789')),doc_name)-1))
+
+-- index_name
+left(doc_name,locate(trim(translate(doc_name,'','0123456789')),doc_name)-1)||left(trim(translate(doc_name,'','0123456789')),3)||'1'
+
+-- Find segment tables for given interval:
+where (( seg.start_date between $from_date and $to_date
+  or   seg.stop_date  between $from_date and $to_date )
+  or ( $from_date between start_date and stop_date
+  and	$to_date between start_date and stop_date
+))
+
+-- **** Date conversions ****
+-----------------------------
+-- DB2 current date to ARS date
+days(date(current date))-days('1970-01-01')+1
+
+-- ARS date (14975) to DB2 date (2010-12-31):
+select date(days('1970-01-01')-1+14975) from sysibm.sysdummy1; 
+-- In Perl:
+strftime("%F",localtime(($resfile-1)*86400)),"\n";
+
+-- ARS date/time (1323788246) to DB2 timestamp (2011-12-13 14:57:26.0):
+select TIMESTAMP('1970-01-01', '00:00:00') + 1323788246 seconds from sysibm.sysdummy1; 
+
+-- DB2 current timestamp to ARS date/time
+select 86400*(DAYS(CURRENT TIMESTAMP)-DAYS('1970-01-01'))+ MIDNIGHT_SECONDS(CURRENT TIMESTAMP) from sysibm.sysdummy1;
+
+-- ARS timestamp to ARS date
+select int(1466413608/86400)+1 from sysibm.sysdummy1;
+
+-- ARS date to MS Excel date
+=D2-1+DATE(1970,1,1)
+
+-- ARS timestamp to MS Excel date
+=(D2/86400)+DATE(1970,1,1)
+
+Agregate in Excel
+------------------
+=if(a2<>a3, sumifs(d:d, a:a, a2), text(,))
+
+-- Add missing index on segment table when updated by arsxml:
+select 
+'CREATE INDEX '||seg.table_name||'_'||decode(bitand(af.mask,16384),16384,af.field+1,af.field)||' ON '||seg.table_name||' ('||
+af.name||' ASC) COMPRESS NO INCLUDE NULL KEYS ALLOW REVERSE SCANS;' as sql,
+seg.table_name||'_'||decode(bitand(af.mask,16384),16384,af.field+1,af.field) as idxname
+from arsagfld af
+  inner join arsseg seg
+    on af.agid=seg.agid
+    and bitand(af.mask,1)=0 -- Index
+  left outer join sysibm.sysindexes s
+    on seg.table_name=s.tbname
+    and '+'||upper(af.name)=s.colnames
+where s.name is null;
+
+-- Get AG name, Segment field name, Segment field type, Segment table for given agid_name/agid
+select ag.agid,ag.name as agname, af.name as segmentfield, 
+  decode(ascii(af.type)*256+ascii(af.qual),20036,'Date',18755,'Date/Time',24900,'DB Date',25155,'DB Date / Time','Unknown') as type, 
+  af2.name as alias,
+  seg.table_name
+from arsag ag
+inner join arsagfld af
+  on ag.agid = af.agid
+  and bitand(af.mask,4) >0
+inner join arsseg seg
+  on ag.agid=seg.agid
+left outer join arsagfld af2
+  on ag.agid=af2.agid
+  and bitand(af2.mask,8) >0
+where ag.agid_name = 'CAA';
+
+-- Decode field's data type:
+decode(ascii(af.type)*256+ascii(af.qual),20036,'Date',18755,'Date/Time',24900,'DB Date',25155,'DB Date / Time','Unknown') as type
+
+-- Reduce space of database
+SELECT 
+  'alter tablespace '||varchar(tbsp_name, 30)||' lower high water mark;',
+  'alter tablespace '||varchar(tbsp_name, 30)||' reduce max;',
+  varchar(tbsp_name, 30) as tbsp_name, 
+  reclaimable_space_enabled,
+  tbsp_free_pages,
+  tbsp_page_top,
+  tbsp_usable_pages
+FROM TABLE(MON_GET_TABLESPACE('',-2)) AS t 
+where t.tbsp_free_pages > 1000 and t.reclaimable_space_enabled = 1 and t.tbsp_name like 'ODADM\_%' escape '\'
+ORDER BY tbsp_free_pages desc;
+
+cache retention not the same as data retention when stored in cache
+-------------------------------------------------------------------
+select ag.* from arsag ag
+  inner join arsnode n
+    on ag.sid=n.sid
+    and bitand(n.status,16)>0	-- Stored in cache
+where ag.DB_EXP_DATE!=ag.SM_CACHE_DOC;
+
+Convert TSM SBCS data
+---------------------
+select from TSM tables:
+select CAST(t.FILESPACE_NAME as VARCHAR(1000) for sbcs data) as FILESPACE_NAME,
+  t.* from tsmdb1.archives t;
+
+convert from Segment to Load expiry type:
+-----------------------------------------
+-- The IBM way:
+This command produces a list of all application groups that can be converted from doc/seg to load: 
+arsslu -m export -o ableToConvert.xml -h ARCHIVE -v -1 TraceExport.out -2 all=7
+This command converts the application groups defined in "test.xml" to expire by load:
+arsslu -m import -i test.xml -h ARCHIVE -v -1 TraceImport.txt -2 all-7
+-- 
+-- Attn: segment date data type (new/old) and (with/without time)
+-- Attn: AGID & AID & SEG_TABLE are hardcoded
+Sample 1:
+insert into arsload 
+select 5701 as AGID,pri_nid,sec_nid,left(doc_name,locate(trim(translate(doc_name,'','0123456789')),doc_name)+2) as NAME,
+    days(min(mtime))-days('1970-01-01')+1 as start,
+    days(max(mtime))-days('1970-01-01')+1 as stop,
+    days(max(mtime))-days('1970-01-01')+1 as exp_date,
+    5702 as AID,count(*) as total_docs,
+    cast(min(mtime) as timestamp) as START_DT,cast(max(mtime) as timestamp) as STOP_DT, cast(max(mtime) as timestamp) as EXP_DT
+from PFA1 group by left(doc_name,locate(trim(translate(doc_name,'','0123456789')),doc_name)+2),pri_nid,sec_nid;
+
+Sample 2:
+insert into arsload 
+select 5618 as AGID,pri_nid,sec_nid,left(doc_name,locate(trim(translate(doc_name,'','0123456789')),doc_name)+2) as NAME,
+    min(scandatum) as start,
+    max(scandatum) as stop,
+    max(scandatum) as exp_date,
+    5619 as AID,count(*) as total_docs,
+    cast(date(days('1970-01-01')-1+min(scandatum)) as timestamp) as START_DT,
+    cast(date(days('1970-01-01')-1+max(scandatum)) as timestamp) as STOP_DT, 
+    cast(date(days('1970-01-01')-1+max(scandatum)) as timestamp) as EXP_DT
+from CFA2 
+group by left(doc_name,locate(trim(translate(doc_name,'','0123456789')),doc_name)+2),pri_nid,sec_nid;
+
+Records de-duplication
+=============================
+SELECT * FROM OLD TABLE (
+    DELETE FROM
+        (SELECT 
+             ROWNUMBER() OVER (PARTITION BY ONE, TWO, THREE) AS RN
+            ,ONE
+            ,TWO
+            ,THREE
+         FROM SESSION.TEST) AS A
+    WHERE RN > 1
+) OLD;
+
+
+DB2 DML without logging:
+db2 -c- "alter table T1 activate not logged initially"
+db2 -c- "update T1 set ..."
+db2 commit
+
+LAX_VM /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.191.b12-0.el7_5.x86_64/jre/bin/java
+
+-- Oracle switch off param substitution
+set define off
+
+DB2 recover after load (WITHOUT) nonrecoverable
+db2 "backup db ENTARCH tablespace (USERSPACE1) online to /dev/null without prompting"
+
+DB2 env variable for using in sub-shell (forked)
+================================================
+export DB2DBDFT=your_database_name
+
+Fast DB2 table copy from database A to database B
+--------------------------------------------------
+db2 -v "DECLARE C1 CURSOR DATABASE AGARCH USER odadm USING adm4archive FOR SELECT * FROM odadm.AKA1 with ur"
+db2 -v "LOAD FROM C1 OF CURSOR TEMPFILES PATH /tmp REPLACE INTO AKA1 nonrecoverable"
+
+
+AIX
+===========
+# Sets the account to never expire password
+chuser maxage=0 username
+chuser expires=0 username
+
+# Clear the flag forcing user to change password on next logon
+pwdadm -c username
+
+# list account parameters
+xp /usr/sbin/lsuser -f username
+
+# Check when last updated pwd
+xp /usr/bin/pwdadm -q odadm|perl -lne 'next unless /(\d+)/;print scalar localtime $1'
+
+# get core dump backtrace
+dbx /opt/ondemand/bin/arssockd ~/core
+where
+
+# delete mailq
+xp postsuper -d ALL
+
+GSK create cert & kdb
+=========================
+a.	Extract server side certificate from our S3 load balancer using:
+echo ""|openssl s_client -showcerts -servername server -connect ds71s3-scs.tauri.ch:443 >cacerta.pem
+
+b.	Create new GSK key ring if not existent already.
+gsk8capicmd -keydb -create -db /opt/ondemand/config/TGARCH.kdb -pw 87654321 -stash -populate
+
+c.	Add extracted certificate(s) to the keyring.
+gsk8capicmd -cert -add -db /opt/ondemand/config/TGARCH.kdb -stashed -file cacerta.pem
+
+d.	Optionally, list known certificates using:
+gsk8capicmd -cert -list -db /opt/ondemand/config/TGARCH.kdb -stashed
+
+e.	Add the GSK configuration to ars.ini:
+SSL_KEYRING_FILE=/opt/ondemand/config/TGARCH.kdb
+SSL_KEYRING_STASH=/opt/ondemand/config/TGARCH.sth
+
+Perl
+===============
+# Split string into equal chunks
+unpack("(A3)*",$a)
+# Use module with explicit function from command line
+-MData::Dumper='Dumper'
+
+Proxy
+===============
+http://clientproxy.corproot.net:8079
+
+CMOD Cache fixes:
+=================
+for f in $(find $(cat /opt/ondemand/config/ars.$(echo $DB2INSTANCE | tr [:lower:] [:upper:]).cache | grep -v \#) -type l) ; do [ ! -e $f ] && echo $f ; done
+for f in $(find $(cat /opt/ondemand/config/ars.$(echo $DB2INSTANCE | tr [:lower:] [:upper:]).cache | grep -v \#) -type l) ; do [ ! -e $f ] && echo $f && rm $f; done
+# Remove from cache
+for l in $(find /ars/tgkb/arscache/TGARCH/retr/VBA -type l) ; do f=$(readlink $l);echo rm $f; echo "rmdir -p $(dirname $f) 2>/dev/null"; echo rm $l; done | sh && rm -rf /ars/tgkb/arscache/TGARCH/retr/VBA
+
+arsload with -B
+================
+mv ASB.0.AKB_ASB_Kundendokumente.AKB_ASB_Kundendokumente-PDF.ind ASB.0.AKB_ASB_Kundendokumente.AKB_ASB_Kundendokumente-PDF.out.ind
+arsload -B IGN.IGN.AG.APP.EXT ASB.0.AKB_ASB_Kundendokumente.AKB_ASB_Kundendokumente-PDF.out
+
+Mount sshfs from NUX:
+======================
+net use X: \\sshfs.k\taanono1=nonix@nux\Development
+
+Parallel DB2 single liner:
+==========================
+for i in $(seq 1 14) ; do export i;(. ~agarch/sqllib/db2profile;echo "update QDA set person_nr=rand()/1000 where uuid in (select uuid from QDA where person_nr=0 order by rand()  fetch first 1000 rows only);" | perl -lpe 'BEGIN{print "connect to AGARCH;"}{s/QDA/QDA$ENV{i}/g}END{print "terminate;"}' | db2 -o- -mstvz QDA${i}.log >/dev/null) & sleep 2; if [ $(jobs -p|wc -l) -ge 5 ] ; then wait -n; fi; done;wait
+
+Another parallel Bash
+---------------------
+for p in $(seq 1 12) ; do 
+  (s=10;echo "$p $s";sleep $s) &
+  [ $(jobs -p|wc -l) -ge 4 ] && wait -n
+done
+wait
+
+-- BLKB fix failed XOMA
+cd /ars/ars-load/spool/error
+for a in $(find . -type f -name "*.afp");do arsload -h BLARCH -f -g BLKB-C0-10-KundenoutputXOMA-Rel1.0 -a BLKB-KundenoutputXOMA-AFP "$a"; mkquittung.sh $(echo "$a"|perl -lne 'print $1 if /\{(\d+?)\}\./'); done
+mv blkb.archiv.quittung.* /ars/ars-load/spool/xoma/out/blkb/
+find . -type f -name "*.csv" -exec rm {} \;
+rmdir 0*
+cd -
+
+Create S3 bucket with object lock usin IAM account
+==================================================
+aws s3api create-bucket --object-lock-enabled-for-bucket --bucket i-ondemand --profile agkb-i-lock
+aws s3api put-object-lock-configuration --bucket i-ondemand --object-lock-configuration '{ "ObjectLockEnabled": "Enabled", "Rule": { "DefaultRetention": { "Mode": "COMPLIANCE", "Days": 1 }}}' --profile agkb-i-lock
+
+S3 listing
+----------
+aws s3 ls s3://i-ondemand --profile agkb-i-ondemand  --recursive | perl -lape '$_=join("/",(split("/",$F[3]))[-3..-1])'
