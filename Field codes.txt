@@ -676,6 +676,20 @@ e.	Add the GSK configuration to ars.ini:
 SSL_KEYRING_FILE=/opt/ondemand/config/TGARCH.kdb
 SSL_KEYRING_STASH=/opt/ondemand/config/TGARCH.sth
 
+S3ls
+=========
+function s3ls {
+p1=$1
+dt=$(date -uR)
+/opt/freeware/bin/curl -skIX GET https://$S3BUCKET.ds71s3-scs.tauri.ch/IBM/ONDEMAND/$1 -H "Date: $dt" -H "Authorization: AWS $S3OWNER:$(echo -en "GET\n\n\n$dt\n/$S3BUCKET/IBM/ONDEMAND/$p1" | openssl dgst -sha1 -mac HMAC -macopt key:$S3KEY -binary | base64)" >$TMPD/s3ls.dat
+if [ $(grep -c ^ETag $TMPD/s3ls.dat) -eq 0 ] ; then
+        echo "$p1 not found on S3"  >&2
+#       cat $TMPD/s3ls.dat >&2
+fi
+cat $TMPD/s3ls.dat
+}
+
+
 Perl
 ===============
 # Split string into equal chunks
