@@ -36,7 +36,7 @@ ARSAG.TYPE -- bit maks
       512 = don't use cache
      1024 = don't search cache
      8192 = Don't Query using paramter markers (uncheck fld)
-    16384 = Use enhanced retention management
+    16384 = ERM relevant, Use enhanced retention management
     32768 = Implied hold (need Use ERM)
     65536 = Automatic TS (reset 16)
    131072 = General - Advanced - Interoperability with P8 - Use CFS-CMOD : Yes (bit set) - No (bit not set)
@@ -58,6 +58,7 @@ ARSAG.EXPIRE_TYPE
 4C = Load
 4D = Storage Manager (zOS)
 41 = Document	
+decode(ag.expire_type,x'53','Segment',x'4C','Load',x'4D','Storage Manager (zOS)',x'41','Document','Error')
 
 ARSAG.MGRT_CACHE_DATE
 ---------------------------
