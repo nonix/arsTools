@@ -1,0 +1,10 @@
+Knowledge base.
+---------------
+
+To search fast large area (binary?) one can use: https://en.cppreference.com/w/cpp/utility/functional/boyer_moore_searcher
+ however, I have hit an issue when compiling on AIX
+
+To access large file whithout need to allocate a buffer and copy by hand, one can use: 
+https://www.ibm.com/docs/en/zos/3.1.0?topic=functions-mmap-map-pages-memory#mmap
+resp. munmap to release
+
