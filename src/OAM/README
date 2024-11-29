@@ -8,3 +8,4 @@ To access large file whithout need to allocate a buffer and copy by hand, one ca
 https://www.ibm.com/docs/en/zos/3.1.0?topic=functions-mmap-map-pages-memory#mmap
 resp. munmap to release
 
+You can use sliceTape.pl to slice the EBCDIC encoded tape. This is pure perl, hence slower.
