@@ -1,11 +1,13 @@
 #!/usr/bin/bash
 export DB2DBDFT=ODLAHD01
 
+# Connect to DB2
+db2 -o- connect to $DB2DBDFT
+trap 'db2 -o- terminate' exit
+
 function getAgNID() {
 	AGID_NAME=$1
-	db2 -o- connect to $DB2DBDFT
 	db2 -xt "select trim(ag.name)||','||n.nid from arsag ag	inner join arsnode n on ag.sid = n.sid where ag.agid_name='$AGID_NAME'"
-	trap 'db2 -o- terminate' exit
 }
 
 function fetchObject() {
