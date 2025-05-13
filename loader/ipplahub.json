@@ -1,0 +1,22 @@
+{
+    "config": [
+        {
+            "landig_dir": "/ars/spool/AGID_NAME",
+            "trigger_pattern": "*.control.*",
+            "agname": "GBBNN0001",
+            "appname": "ABBNN0001",
+            "pre_processor": "bash_function",
+            "index_type": "ind",
+            "is_cumulative": true
+        },
+        {
+            "landig_dir": "/ars/spool/AGID_NAME2",
+            "trigger_pattern": "*.control.*",
+            "agname": "GBBAB0001",
+            "appname": "ABBAB0001",
+            "pre_processor": "bash_function",
+            "index_type": "in",
+            "is_cumulative": true
+        }
+    ]
+}
