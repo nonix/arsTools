@@ -185,31 +185,37 @@ TBLSPCRT( ArcCSXitApplGroup *appl_grp,
 
    rc = 0;
    *created = 0;
-
+/*
 	fprintf(stderr,"DEBUG[action.in]: %d\n",action);			
 	fprintf(stderr,"DEBUG[tblsp_name.in]: %s\n",tblsp_name);
 	fprintf(stderr,"DEBUG[table_name.in]: %s\n",table_name);
 	fprintf(stderr,"DEBUG[SQL.in]: %s\n",sql);
-
+*/
 	/* get a copy of table name */
 	char *agid_name = strdup(table_name);
 	memset(agid_name,0,strlen(table_name)+1);
 
+/*
 fprintf(stderr,"DEBUG: sizeof=%d\n",strlen(table_name));
-
+*/
 	/* extract agid_name from table_name */
 	extractPrefix(mytable_name,agid_name,strlen(table_name)+1);
 
+/*
 fprintf(stderr,"DEBUG: agid_name=%s\n",agid_name);
-
+*/
 	/* extract segid from table_name */
 	int segid = extractNumber(mytable_name);
 	int tsid = segid - ((segid -1) % 3);
 
+/*
 fprintf(stderr,"DEBUG: tsid=%d\n",tsid);
+*/
 
-	sprintf(mytblsp_name,"lahub_%s%d",agid_name,tsid);
+	sprintf(mytblsp_name,"odadm_%s%d",agid_name,tsid);
+/*
 fprintf(stderr,"DEBUG: newts=%s\n",mytblsp_name);
+*/
 
 	if (action == 1) {
 		/* create tablespace */
@@ -233,12 +239,12 @@ fprintf(stderr,"DEBUG: newts=%s\n",mytblsp_name);
 	free(mytable_name);
 	free(mytblsp_name);
 	free(agid_name);
-	
+/*	
 	fprintf(stderr,"DEBUG[action.out]: %d\n",action);			
 	fprintf(stderr,"DEBUG[tblsp_name.out]: %s\n",tblsp_name);
 	fprintf(stderr,"DEBUG[table_name.out]: %s\n",table_name);
 	fprintf(stderr,"DEBUG[sql.out]: %s\n",sql);
 	fprintf(stderr,"DEBUG[created.out]: %d\n\n",*created);			
-
+*/
    return( rc );
 }
