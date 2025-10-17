@@ -1,0 +1,48 @@
+1 SUMMARY CREATION DATE:                 Friday, 17 October 2025 10:35:38
+  CLIENT VERSION:                        10.5.0.8
+  SERVER VERSION:                        10.5.0.8
+  SUMMARY BY:                            ADMIN
+ 
+                                             ************************
+                                             * APPLICATIONS SUMMARY *
+                                             ************************
+ 
+  *************************************************************************************************************
+  APPLICATION NAME:  NN_TEST5
+ 
+  *** GENERAL ***
+    APPLICATION GROUP NAME:  NN_TEST5
+    IDENTIFIER:              
+    DESCRIPTION:             
+ 
+  *** VIEW INFORMATION ***
+      DATA TYPE:    Line
+      CODE PAGE:    1208  
+      RECFM:        Stream
+      DELIMITER:    0A
+      CC:           No
+      TRC:          No
+      CCTYPE:       
+      PRMODE:       None
+      LINE COUNT:   
+ 
+  *** MISCELLANEOUS OPTIONS ***
+    LIFE OF DATA AND INDEXES (DAYS):  Use Application Group Value
+ 
+  *** CLIENT OPTIONS ***
+    PRINT LINE COUNT:        
+    DEFAULT SERVER PRINTER:  *NONE
+    DEFAULT SETTINGS:        Print All Pages
+    CICS JCL PARAMETERS:     
+  
+    *** IMAGE OVERLAY FILES ***
+      IDENTIFIER:  Norbert
+      FILE NAME:   /ars/home/etc/Norbert.dll
+ 
+ 
+  *** SERVER OPTIONS ***
+    PRINT PARAMETERS:          
+    USE PREVIEW EXIT:          No
+    PARAMETERS:                
+ 
+  *************************************************************************************************************
