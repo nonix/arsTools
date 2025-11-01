@@ -1,0 +1,4 @@
+// mydll.rc
+#include "resource.h"
+
+IDB_IMAGE BITMAP "Norbert.bmp"

@@ -1,0 +1,3 @@
+LIBRARY "NorbertM"
+EXPORTS
+    LoadMyBitmap
