@@ -5,6 +5,7 @@ gcc t.c -L. -llahlib -o t
 */
 void main(int argc, char* argv[]) {
     int ret = 0;
-    str2arsdate(argv[1],1,&ret);
+    int fb = 10;
+    str2arsdate(argv[1],&fb,&ret);
     printf("%ld\n", ret);
 }

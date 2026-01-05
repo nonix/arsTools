@@ -1,11 +1,11 @@
 #include "liblah.h"
 
-void str2arsdate(const char* ymd, const int fallback, int* retval) {
+void str2arsdate(const char* ymd, const int* fallback, int* retval) {
     struct tm t = {0};
     struct tm save_t = {0};
     char c[5] = {0};
 
-    *retval = fallback;
+    *retval = *fallback;
 
     // Cut & check the Year
     strncpy(c,&ymd[0],4);

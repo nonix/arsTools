@@ -13,6 +13,6 @@ gcc -fPIC -fvisibility=hidden -shared liblah.c -o liblah.so
 
 __attribute__((visibility("default")))
 
-void str2arsdate(const char* ymd, const int fallback, int* retval);
+void str2arsdate(const char* ymd, const int* fallback, int* retval);
 
 #endif
