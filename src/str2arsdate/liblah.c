@@ -26,7 +26,9 @@ void str2arsdate(const char* ymd, const int fallback, int* retval) {
 
     // save a copy & convert
     memcpy(&save_t, &t, sizeof(t));
-    time_t epoch = timegm(&t);
+    setenv("TZ","UTC",1);
+    tzset();
+    time_t epoch = mktime(&t);
 
     // check for skew
     if (t.tm_year != save_t.tm_year ||
