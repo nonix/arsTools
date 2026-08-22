@@ -1,7 +1,8 @@
 to compile:
-gcc -fPIC -m64 -O2 -shared \
-    -I$HOME/sqllib/include casauthorize.c \
-    -o $HOME/sqllib/function/libcasauthorize.so -lcurl
+
+    gcc -fPIC -m64 -O2 -shared \
+        -I$HOME/sqllib/include casauthorize.c \
+        -o $HOME/sqllib/function/libcasauthorize.so -lcurl
 
 to configure:
 
