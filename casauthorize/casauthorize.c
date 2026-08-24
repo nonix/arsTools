@@ -217,30 +217,17 @@ SQL_API_RC SQL_API_FN casauthorize(
     }
 
     /* ----- 1. Validate & Parse userid (t + 1-8 digits) ------------- */
-    if (userid[0] != 't') {
+    if (toupper(userid[0]) != 'T') {
         strcpy(sqlstate, "38503");
-        strncpy(msg, "casauthorize: userid must start with 't'", MSG_LEN - 1);
+        strncpy(msg, "casauthorize: userid must start with 'T'", MSG_LEN - 1);
         msg[MSG_LEN - 1] = '\0';
         return 0;
     }
 
-    char numbuf[9];
-    size_t ulen = 0;
-    for (int i = 1; i < 9; ++i) {
-        if (userid[i] == ' ' || userid[i] == '\0') break;
-        if (userid[i] < '0' || userid[i] > '9') {
-            strcpy(sqlstate, "38503");
-            strncpy(msg, "casauthorize: userid numeric part contains non-digits", MSG_LEN - 1);
-            msg[MSG_LEN - 1] = '\0';
-            return 0;
-        }
-        numbuf[ulen++] = userid[i];
-    }
-    numbuf[ulen] = '\0';
-
-    if (ulen == 0) {
+	long uid_num = atol(userid+1);
+	if (uid_num == 0) {
         strcpy(sqlstate, "38503");
-        strncpy(msg, "casauthorize: userid missing numeric part", MSG_LEN - 1);
+        strncpy(msg, "casauthorize: userid must be a Tnumber", MSG_LEN - 1);
         msg[MSG_LEN - 1] = '\0';
         return 0;
     }
@@ -285,7 +272,7 @@ SQL_API_RC SQL_API_FN casauthorize(
      * Maximum userid is 99999999 (0x05F5E0FF), so the max combined key 
      * is 0x55F5E0FF, which safely fits in a signed 32-bit integer.
      */
-    long uid_num = atol(numbuf);
+
     key_t shmkey = (key_t)(0x50000000L + uid_num);
     key_t semkey = (key_t)(0x51000000L + uid_num);
 	
