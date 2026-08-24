@@ -16,3 +16,7 @@ to configure:
     #define REST_URL           "http://localhost:8000/authorize"
     #define REST_TIMEOUT_SEC   5L
     #define MSG_LEN            1024
+
+query restrictions:
+
+    casauthorize('$ODUSERID',BCNR,KONTONR) = 1
