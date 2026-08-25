@@ -1,30 +1,4 @@
 /* =====================================================================
- *  authcache.c
- *
- *  DB2 11.5 LUW external (scalar) function, LANGUAGE C, PARAMETER STYLE SQL
- *
- *  Signature (SQL):
- *      casauthorize(userid CHAR(9), bcnr CHAR(4), kontonr CHAR(8))
- *          RETURNS SMALLINT
- *
- *  Cache Layout per access key (user):
- *      [0..3]   uint32  epoch seconds of last access (read or write)
- *      [4..1303] 100 records of 13 bytes each
- *
- *  Record Layout:
- *      [0..11]  key: bcnr(4) + kontonr(8) (space padded to 8)
- *      [12]     value: 0 = false, 1 = true
- *
- *  Eviction: Strict FIFO. On miss, memory is shifted left by 1 record,
- *            discarding the oldest, and the new record is placed at [99].
- * ===================================================================== */
-/*
-* Compile:
-  gcc -fPIC -m64 -O2 -shared \
-    -I$HOME/sqllib/include casauthorize.c \
-    -o $HOME/sqllib/function/libcasauthorize.so -lcurl
-*/
-/* =====================================================================
  *  casauthorize.c
  * ===================================================================== */
 
@@ -51,7 +25,7 @@
 #define AUTH_KEY_LEN       (BCNR_LEN + KONTO_MAX)        /* 12 bytes */
 #define AUTH_RECORD_LEN    (AUTH_KEY_LEN + 1)            /* 13 bytes */
 #define AUTH_BUCKET_BYTES  (4 + (AUTH_MAX_ENTRIES * AUTH_RECORD_LEN)) /* 1304 */
-#define REST_URL           "http://localhost:8000/authorize"
+#define REST_URL           "http://localhost:8000/authorization"
 #define REST_TIMEOUT_SEC   5L
 #define MSG_LEN            1024
 
@@ -154,10 +128,21 @@ done:
 }
 
 /* ------------------------------------------------------------------- */
+/*  AIX requires union semun to be defined by the user                  */
+/* ------------------------------------------------------------------- */
+#if defined(_AIX)
+union semun {
+    int val;
+    struct semid_ds *buf;
+    unsigned short *array;
+};
+#endif
+
+/* ------------------------------------------------------------------- */
 /*  SysV semaphore helpers                                              */
 /* ------------------------------------------------------------------- */
 static int sem_lock(int semid) {
-    struct sembuf op = { 0, -1, SEM_UNDO };
+    struct sembuf op = { 0, -1, 0 }; /* Removed SEM_UNDO for DB2 process safety */
     while (semop(semid, &op, 1) == -1) {
         if (errno == EINTR) continue;
         return -1;
@@ -165,7 +150,7 @@ static int sem_lock(int semid) {
     return 0;
 }
 static void sem_unlock(int semid) {
-    struct sembuf op = { 0, +1, SEM_UNDO };
+    struct sembuf op = { 0, +1, 0 };
     while (semop(semid, &op, 1) == -1 && errno == EINTR) ;
 }
 
@@ -217,23 +202,35 @@ SQL_API_RC SQL_API_FN casauthorize(
     }
 
     /* ----- 1. Validate & Parse userid (t + 1-8 digits) ------------- */
-    if (toupper(userid[0]) != 'T') {
+    if (userid[0] != 't') {
         strcpy(sqlstate, "38503");
-        strncpy(msg, "casauthorize: userid must start with 'T'", MSG_LEN - 1);
+        strncpy(msg, "casauthorize: userid must start with 't'", MSG_LEN - 1);
         msg[MSG_LEN - 1] = '\0';
         return 0;
     }
 
-	long uid_num = atol(userid+1);
-	if (uid_num == 0) {
+    char numbuf[9];
+    size_t ulen = 0;
+    for (int i = 1; i < 9; ++i) {
+        if (userid[i] == ' ' || userid[i] == '\0') break;
+        if (userid[i] < '0' || userid[i] > '9') {
+            strcpy(sqlstate, "38503");
+            strncpy(msg, "casauthorize: userid numeric part contains non-digits", MSG_LEN - 1);
+            msg[MSG_LEN - 1] = '\0';
+            return 0;
+        }
+        numbuf[ulen++] = userid[i];
+    }
+    numbuf[ulen] = '\0';
+
+    if (ulen == 0) {
         strcpy(sqlstate, "38503");
-        strncpy(msg, "casauthorize: userid must be a Tnumber", MSG_LEN - 1);
+        strncpy(msg, "casauthorize: userid missing numeric part", MSG_LEN - 1);
         msg[MSG_LEN - 1] = '\0';
         return 0;
     }
 
     /* ----- 2. Validate & Parse bcnr (0-4 alnum chars) -------------- */
-    /* If bcnr is provided NULL by DB2, treat as empty string */
     const char *bcnr_p = (*bcnrInd < 0) ? "" : bcnr;
     char bcnr_trim[BCNR_LEN + 1];
     size_t blen = 0;
@@ -266,16 +263,10 @@ SQL_API_RC SQL_API_FN casauthorize(
     konto_trim[klen] = '\0';
 
     /* ----- 4. Setup Shared Memory keys ----------------------------- */
-    /* 
-     * Offset keys to a specific application namespace (0x50xxxxxx).
-     * This guarantees they will not collide with DB2's or OS segments.
-     * Maximum userid is 99999999 (0x05F5E0FF), so the max combined key 
-     * is 0x55F5E0FF, which safely fits in a signed 32-bit integer.
-     */
-
+    long uid_num = atol(numbuf);
     key_t shmkey = (key_t)(0x50000000L + uid_num);
     key_t semkey = (key_t)(0x51000000L + uid_num);
-	
+
     /* ----- Acquire / create the shm segment ---------------------- */
     int shmid = shmget(shmkey, AUTH_BUCKET_BYTES, 0666);
     if (shmid == -1 && errno == ENOENT) {
@@ -290,8 +281,12 @@ SQL_API_RC SQL_API_FN casauthorize(
         semid = semget(semkey, 1, IPC_CREAT | IPC_EXCL | 0666);
         if (semid == -1 && errno == EEXIST)
             semid = semget(semkey, 1, 0666);
-        else if (semid != -1)
-            (void)semctl(semid, 0, SETVAL, 1); 
+        else if (semid != -1) {
+            /* FIX: Use proper union semun for AIX compatibility */
+            union semun arg;
+            arg.val = 1;
+            (void)semctl(semid, 0, SETVAL, arg); 
+        }
     }
 
     /* Fallback to direct REST if IPC mechanisms fail */
